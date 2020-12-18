@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+__version__ = "0.0.1"
+__desc__ = "Automate process of downloading name your price albums from bandcamp."
+
 import argparse
 import os
 import re
@@ -12,7 +15,8 @@ from selenium.common.exceptions import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
+
 
 drivers = (
     "phantomjs",
@@ -28,8 +32,8 @@ drivers = (
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="bandcamp-name-your-price-dl",
-        description="Automate process of downloading name your price albums from bandcamp",
+        prog="bandcamp_name_your_price_dl",
+        description=__desc__,
     )
     parser.add_argument(
         "album_url",
@@ -76,7 +80,9 @@ def main():
         help="desired webdriver (default is chromium)",
     )
     parser.add_argument(
-        "--show-browser-window", action="store_true", help="show browser window"
+        "--show-browser-window",
+        action="store_true",
+        help="show browser window (is hidden by default)",
     )
     parser.add_argument(
         "--print-url",
@@ -240,9 +246,12 @@ def get_album_download_url(
     driver.execute_script("arguments[0].click();", checkout_button)
 
     if asked_for_email:
-        link_from_email = input(
-            "An email with download link has been sent to", email_address + ".", "Paste link here to continue: "
+        eprint(
+            "An email with download link has been sent to",
+            email_address + ".",
+            "Paste link here to continue: ",
         )
+        link_from_email = input()
         driver.get(link_from_email)
     else:
         WebDriverWait(driver, page_load_wait_time).until(
