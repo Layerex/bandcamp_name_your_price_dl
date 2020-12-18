@@ -12,7 +12,7 @@ from selenium.common.exceptions import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 
 
 def main():
@@ -78,6 +78,24 @@ def main():
         action="store_true",
         help="print url to stdout instead of downloading",
     )
+    parser.add_argument(
+        "--email",
+        type=str,
+        help="your email address (is used if bandcamp asks for email)",
+    )
+    parser.add_argument(
+        "--country-abbrev",
+        "--country",
+        type=str,
+        help="country abbreviation used if bandcamp asks for email",
+    )
+    parser.add_argument(
+        "--postal-code",
+        "--postcode",
+        "--zip-code",
+        type=str,
+        help="postal code used if bandcamp asks for email",
+    )
     args = parser.parse_args(sys.argv[1:])
 
     if args.encoding is not None:
@@ -114,6 +132,9 @@ def main():
         check_if_album_is_name_your_price=args.skip_nyp_check,
         page_load_wait_time=args.wait_time,
         preparing_wait_time=args.preparing_wait_time,
+        email_address=args.email,
+        country_abbrev=args.country_abbrev,
+        postal_code=args.postal_code,
         driver=driver,
     )
     if type(download_url) is int:
@@ -135,6 +156,9 @@ def get_album_download_url(
     check_if_album_is_name_your_price=True,
     page_load_wait_time=10,
     preparing_wait_time=60,
+    email_address=None,
+    country_abbrev=None,
+    postal_code=None,
     driver=None,
 ):
     if driver is None:
@@ -168,15 +192,46 @@ def get_album_download_url(
     )
     free_download_link.click()
 
-    # TODO: Handle bandcamp asking for email here
+    # Handle bandcamp asking for email
+    try:
+        # Check if element is interactable first to exit try block immediately if it is
+        # not present
+        email_input = driver.find_element_by_xpath("//*[@id='fan_email_address']")
+        email_input.send_keys(str(email_address))
+
+        asked_for_email = True
+        if email_address is None or postal_code is None:
+            eprint(
+                "Bandcamp asked for email, but no email address or postal code specified. Aborting."
+            )
+            return 2
+        if country_abbrev is not None:
+            country_dropdown_list = Select(
+                driver.find_element_by_xpath("//*[@id='fan_email_country']")
+            )
+            country_dropdown_list.select_by_value(country_abbrev.upper())
+        postal_code_input = driver.find_element_by_xpath(
+            "//*[@id='fan_email_postalcode']"
+        )
+        postal_code_input.send_keys(postal_code)
+    except ElementNotInteractableException as e:
+        asked_for_email = False
 
     checkout_button = driver.find_element_by_xpath(
         "//button[@class='download-panel-checkout-button']"
     )
-
     # Selenium thinks that checkout button is invisible and refuses to click it, so we click it with JavaScript
     driver.execute_script("arguments[0].click();", checkout_button)
-    WebDriverWait(driver, 10).until(lambda driver: driver.current_url != album_url)
+
+    if asked_for_email:
+        link_from_email = input(
+            "An email with download link has been sent to", email_address + ".", "Paste link here to continue: "
+        )
+        driver.get(link_from_email)
+    else:
+        WebDriverWait(driver, page_load_wait_time).until(
+            lambda driver: driver.current_url != album_url
+        )
 
     # Choose encoding from dropdown list
     if onsite_encoding is not None:
