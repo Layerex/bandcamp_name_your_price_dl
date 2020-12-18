@@ -14,6 +14,17 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
+drivers = (
+    "phantomjs",
+    "chromium",
+    "chrome",
+    "edge",
+    "firefox",
+    "opera",
+    "safari",
+    "webkit",
+)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -31,7 +42,7 @@ def main():
         metavar="download_dir",
         type=str,
         nargs="?",
-        help="directory to download archive with album to",
+        help="directory to download album to",
     )
     parser.add_argument(
         "--encoding",
@@ -61,16 +72,11 @@ def main():
     )
     parser.add_argument(
         "--driver",
-        choices=(
-            "chromium",
-            "chrome",
-            "edge",
-            "firefox",
-            "opera",
-            "safari",
-            "webkit",
-        ),
+        choices=drivers,
         help="desired webdriver (default is chromium)",
+    )
+    parser.add_argument(
+        "--show-browser-window", action="store_true", help="show browser window"
     )
     parser.add_argument(
         "--print-url",
@@ -110,23 +116,35 @@ def main():
     else:
         onsite_encoding = None
 
-    if args.driver is not None:
-        if args.driver == "firefox":
-            driver = webdriver.Firefox()
-        elif args.driver in ("chrome", "chromium"):
-            driver = webdriver.Chrome()
-        elif args.driver == "edge":
-            driver = webdriver.Edge()
-        elif args.driver == "opera":
-            driver = webdriver.Opera()
-        elif args.driver == "safari":
-            driver = webdriver.Safari()
-        elif args.driver == "webkit":
-            driver = webdriver.WebKitGTK()
+    if args.driver not in drivers:
+        args.driver = "chromium"
+
+    if args.driver == "phantomjs":
+        driver = webdriver.PhantomJS()
+    elif args.driver == "firefox":
+        if not args.show_browser_window:
+            os.environ["MOZ_HEADLESS"] = "1"
+        driver = webdriver.Firefox()
+    elif args.driver in ("chrome", "chromium"):
+        if not args.show_browser_window:
+            options = webdriver.ChromeOptions()
+            options.add_argument("--headless")
+        else:
+            options = None
+        driver = webdriver.Chrome(options=options)
+    elif args.driver == "edge":
+        driver = webdriver.Edge()
+    elif args.driver == "opera":
+        driver = webdriver.Opera()
+    elif args.driver == "safari":
+        driver = webdriver.Safari()
+    elif args.driver == "webkit":
+        driver = webdriver.WebKitGTK()
     else:
         driver = None
 
     download_url = get_album_download_url(
+        driver,
         args.album_url,
         onsite_encoding=onsite_encoding,
         check_if_album_is_name_your_price=args.skip_nyp_check,
@@ -135,7 +153,6 @@ def main():
         email_address=args.email,
         country_abbrev=args.country_abbrev,
         postal_code=args.postal_code,
-        driver=driver,
     )
     if type(download_url) is int:
         exit(download_url)
@@ -151,6 +168,7 @@ def main():
 
 
 def get_album_download_url(
+    driver,
     album_url,
     onsite_encoding=None,
     check_if_album_is_name_your_price=True,
@@ -159,10 +177,8 @@ def get_album_download_url(
     email_address=None,
     country_abbrev=None,
     postal_code=None,
-    driver=None,
 ):
-    if driver is None:
-        driver = webdriver.Chrome()
+    eprint("Opening", album_url, "...")
     driver.get(album_url)
 
     # Check if album is actually name your price
