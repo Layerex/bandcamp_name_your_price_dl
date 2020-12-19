@@ -98,6 +98,11 @@ def main():
         help="print url to stdout instead of downloading",
     )
     parser.add_argument(
+        "--skip-if-file-exists",
+        action="store_true",
+        help="skip download if desired file already exists",
+    )
+    parser.add_argument(
         "--email",
         type=str,
         help="your email address (is used if bandcamp asks for email)",
@@ -177,7 +182,9 @@ def main():
         else:
             download_dir = args.download_dir
         download_dir = os.path.abspath(download_dir)
-        download_file(download_url, download_dir)
+        download_file(
+            download_url, download_dir, skip_if_file_exists=args.skip_if_file_exists
+        )
 
 
 def get_album_download_url(
@@ -290,16 +297,19 @@ def get_album_download_url(
     return direct_download_link.get_attribute("href")
 
 
-def download_file(url, download_dir):
+def download_file(url, download_dir, skip_if_file_exists=False):
     with requests.get(url, stream=True) as r:
         content_disposition_header = r.headers["content-disposition"]
         on_server_file_name = re.findall('filename="(.+)"', content_disposition_header)[
             0
         ]
         local_filename = os.path.join(download_dir, on_server_file_name)
-        eprint("Downloading album to", local_filename, "...")
-        with open(local_filename, "wb") as f:
-            shutil.copyfileobj(r.raw, f)
+        if os.path.exists(local_filename) and skip_if_file_exists:
+            eprint("File exists. Skipping download.")
+        else:
+            eprint("Downloading album to", local_filename, "...")
+            with open(local_filename, "wb") as f:
+                shutil.copyfileobj(r.raw, f)
 
 
 def eprint(*args, **kwargs):
