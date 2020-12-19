@@ -5,7 +5,7 @@ Automate process of downloading name your price albums from bandcamp with Seleni
 ## Installation
 
 ```sh
-pip install bandcamp-name-your-price-dl
+pip install bandcamp_name_your_price_dl
 ```
 
 Also you need to install browser drivers. Refer to [selenium installation guide](https://selenium-python.readthedocs.io/installation.html#drivers).
@@ -13,9 +13,10 @@ Also you need to install browser drivers. Refer to [selenium installation guide]
 ## Usage
 
 ```text
-usage: bandcamp_name_your_price_dl [-h] [--encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}] [--skip-nyp-check] [--wait-time seconds] [--preparing-wait-time seconds]
-                                   [--driver {phantomjs,chromium,chrome,edge,firefox,opera,safari,webkit}] [--show-browser-window] [--print-url] [--email EMAIL] [--country-abbrev COUNTRY_ABBREV]
-                                   [--postal-code POSTAL_CODE]
+
+usage: bandcamp_name_your_price_dl [-h] [--download-dir download_dir] [--encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}] [--skip-nyp-check] [--wait-time seconds] [--preparing-wait-time seconds]
+                                   [--driver {phantomjs,chromium,chrome,edge,firefox,opera,safari,webkit}] [--show-browser-window] [--print-url] [--skip-if-file-exists] [--email EMAIL]
+                                   [--country-abbrev COUNTRY_ABBREV] [--postal-code POSTAL_CODE]
                                    album_url [download_dir]
 
 Automate process of downloading name your price albums from bandcamp.
@@ -26,6 +27,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  --download-dir download_dir, -d download_dir
+                        directory to download album to
   --encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}, -e {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}
                         desired encoding
   --skip-nyp-check      don't check if album is name your price before downloading
@@ -37,6 +40,8 @@ optional arguments:
   --show-browser-window
                         show browser window (is hidden by default)
   --print-url, --p      print url to stdout instead of downloading
+  --skip-if-file-exists
+                        skip download if desired file already exists
   --email EMAIL         your email address (is used if bandcamp asks for email)
   --country-abbrev COUNTRY_ABBREV, --country COUNTRY_ABBREV
                         country abbreviation used if bandcamp asks for email
