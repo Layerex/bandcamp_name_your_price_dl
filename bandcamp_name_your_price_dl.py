@@ -49,6 +49,13 @@ def main():
         help="directory to download album to",
     )
     parser.add_argument(
+        "--download-dir",
+        "-d",
+        metavar="download_dir",
+        type=str,
+        help="directory to download album to",
+    )
+    parser.add_argument(
         "--encoding",
         "-e",
         type=str,
