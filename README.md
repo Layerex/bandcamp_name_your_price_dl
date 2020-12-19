@@ -48,3 +48,18 @@ optional arguments:
   --postal-code POSTAL_CODE, --postcode POSTAL_CODE, --zip-code POSTAL_CODE
                         postal code used if bandcamp asks for email
 ```
+
+## Usage example
+
+To list albums of an artist you may use [bandcamp_list_albums](https://github.com/Layerex/bandcamp_list_albums)
+
+### Download discography of an artist
+
+```sh
+for album in $(bandcamp_list_albums --print-urls)
+do
+    bandcamp_name_your_price_dl "$album"
+done
+```
+
+You may also want to specify download directory, email, country and postcode
