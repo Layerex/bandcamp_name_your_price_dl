@@ -93,7 +93,7 @@ def main():
     )
     parser.add_argument(
         "--print-url",
-        "--p",
+        "-p",
         action="store_true",
         help="print url to stdout instead of downloading",
     )
