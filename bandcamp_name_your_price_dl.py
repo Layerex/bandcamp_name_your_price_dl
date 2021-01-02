@@ -22,6 +22,7 @@ drivers = (
     "chrome",
     "edge",
     "firefox",
+    "gecko",
     "opera",
     "phantomjs",
     "safari",
@@ -136,11 +137,7 @@ def main():
     if args.driver not in drivers:
         args.driver = "chromium"
 
-    if args.driver == "firefox":
-        if not args.show_browser_window:
-            os.environ["MOZ_HEADLESS"] = "1"
-        driver = webdriver.Firefox()
-    elif args.driver in ("chrome", "chromium"):
+    if args.driver in ("chrome", "chromium"):
         if not args.show_browser_window:
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
@@ -149,6 +146,10 @@ def main():
         driver = webdriver.Chrome(options=options)
     elif args.driver == "edge":
         driver = webdriver.Edge()
+    elif args.driver in ("firefox", "gecko"):
+        if not args.show_browser_window:
+            os.environ["MOZ_HEADLESS"] = "1"
+        driver = webdriver.Firefox()
     elif args.driver == "opera":
         driver = webdriver.Opera()
     elif args.driver == "phantomjs":
