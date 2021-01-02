@@ -17,14 +17,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
-
 drivers = (
-    "phantomjs",
     "chromium",
     "chrome",
     "edge",
     "firefox",
     "opera",
+    "phantomjs",
     "safari",
     "webkit",
 )
@@ -137,9 +136,7 @@ def main():
     if args.driver not in drivers:
         args.driver = "chromium"
 
-    if args.driver == "phantomjs":
-        driver = webdriver.PhantomJS()
-    elif args.driver == "firefox":
+    if args.driver == "firefox":
         if not args.show_browser_window:
             os.environ["MOZ_HEADLESS"] = "1"
         driver = webdriver.Firefox()
@@ -154,12 +151,12 @@ def main():
         driver = webdriver.Edge()
     elif args.driver == "opera":
         driver = webdriver.Opera()
+    elif args.driver == "phantomjs":
+        driver = webdriver.PhantomJS()
     elif args.driver == "safari":
         driver = webdriver.Safari()
     elif args.driver == "webkit":
         driver = webdriver.WebKitGTK()
-    else:
-        driver = None
 
     download_url = get_album_download_url(
         driver,
