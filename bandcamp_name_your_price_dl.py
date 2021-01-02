@@ -63,7 +63,8 @@ def main():
     )
     parser.add_argument(
         "--skip-nyp-check",
-        action="store_false",
+        "--skip-name-your-price-check",
+        action="store_true",
         help="don't check if album is name your price before downloading",
     )
     parser.add_argument(
@@ -160,7 +161,7 @@ def main():
         driver = webdriver.WebKitGTK()
 
     album_url = args.album_url
-    check_if_album_is_name_your_price = args.skip_nyp_check
+    check_if_album_is_name_your_price = not args.skip_nyp_check
     page_load_wait_time = args.wait_time
     preparing_wait_time = args.preparing_wait_time
     email_address = args.email
