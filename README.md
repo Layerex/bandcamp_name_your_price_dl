@@ -55,8 +55,8 @@ To list albums of an artist you may use [bandcamp_list_albums](https://github.co
 
 ### Download discography of an artist
 
-```sh
-for album in $(bandcamp_list_albums --print-urls)
+```bash
+for album in $(bandcamp_list_albums $bandcamp_page_url --print-urls)
 do
     bandcamp_name_your_price_dl "$album"
 done
