@@ -83,6 +83,7 @@ def main():
     )
     parser.add_argument(
         "--driver",
+        "--webdriver",
         choices=drivers,
         help="desired webdriver (default is chromium)",
     )
