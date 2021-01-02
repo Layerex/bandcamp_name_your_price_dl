@@ -168,7 +168,6 @@ def main():
     country_abbrev = args.country_abbrev
     postal_code = args.postal_code
 
-
     eprint("Opening", album_url, "...")
     driver.get(album_url)
 
@@ -277,7 +276,6 @@ def main():
     )
     download_url = direct_download_link.get_attribute("href")
 
-
     if args.print_url:
         print(download_url)
     else:
@@ -286,24 +284,19 @@ def main():
         else:
             download_dir = args.download_dir
         download_dir = os.path.abspath(download_dir)
-        download_file(
-            download_url, download_dir, skip_if_file_exists=args.skip_if_file_exists
-        )
 
-
-def download_file(url, download_dir, skip_if_file_exists=False):
-    with requests.get(url, stream=True) as r:
-        content_disposition_header = r.headers["content-disposition"]
-        on_server_file_name = re.findall('filename="(.+)"', content_disposition_header)[
-            0
-        ]
-        local_filename = os.path.join(download_dir, on_server_file_name)
-        if os.path.exists(local_filename) and skip_if_file_exists:
-            eprint("File exists. Skipping download.")
-        else:
-            eprint("Downloading album to", local_filename, "...")
-            with open(local_filename, "wb") as f:
-                shutil.copyfileobj(r.raw, f)
+        with requests.get(download_url, stream=True) as r:
+            content_disposition_header = r.headers["content-disposition"]
+            on_server_file_name = re.findall(
+                'filename="(.+)"', content_disposition_header
+            )[0]
+            local_filename = os.path.join(download_dir, on_server_file_name)
+            if os.path.exists(local_filename) and args.skip_if_file_exists:
+                eprint("File exists. Skipping download.")
+            else:
+                eprint("Downloading album to", local_filename, "...")
+                with open(local_filename, "wb") as f:
+                    shutil.copyfileobj(r.raw, f)
 
 
 def eprint(*args, **kwargs):
