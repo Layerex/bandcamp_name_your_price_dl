@@ -199,18 +199,28 @@ def get_album_download_url(
     driver.get(album_url)
 
     # Check if album is actually name your price
-    if (
-        check_if_album_is_name_your_price
-        and driver.find_element_by_xpath(
-            "//span[@class='buyItemExtra buyItemNyp secondaryText']"
-        ).text
-        != "name your price"
-    ):
-        eprint("Album is not name your price. Aborting.")
+    try:
+        if (
+            check_if_album_is_name_your_price
+            and driver.find_element_by_xpath(
+                "//span[@class='buyItemExtra buyItemNyp secondaryText']"
+            ).text
+            != "name your price"
+        ):
+            eprint("Album is not name your price. Aborting.")
+            return 1
+    except NoSuchElementException:
+        eprint("Element indicating if is album name your price not found. Aborting.")
         return 1
 
-    buy_link = driver.find_element_by_xpath("//button[@class='download-link buy-link']")
-    buy_link.click()
+    try:
+        buy_link = driver.find_element_by_xpath(
+            "//button[@class='download-link buy-link']"
+        )
+        buy_link.click()
+    except NoSuchElementException:
+        eprint('"Buy Digital Album" link not found. Aborting')
+        return 1
 
     price_input_filled = driver.find_element_by_xpath(
         "//input[@class='display-price numeric']"
