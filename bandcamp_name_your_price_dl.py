@@ -159,43 +159,15 @@ def main():
     elif args.driver == "webkit":
         driver = webdriver.WebKitGTK()
 
-    download_url = get_album_download_url(
-        driver,
-        args.album_url,
-        onsite_encoding=onsite_encoding,
-        check_if_album_is_name_your_price=args.skip_nyp_check,
-        page_load_wait_time=args.wait_time,
-        preparing_wait_time=args.preparing_wait_time,
-        email_address=args.email,
-        country_abbrev=args.country_abbrev,
-        postal_code=args.postal_code,
-    )
-    if type(download_url) is int:
-        exit(download_url)
-    if args.print_url:
-        print(download_url)
-    else:
-        if args.download_dir is None:
-            download_dir = os.path.curdir
-        else:
-            download_dir = args.download_dir
-        download_dir = os.path.abspath(download_dir)
-        download_file(
-            download_url, download_dir, skip_if_file_exists=args.skip_if_file_exists
-        )
+    album_url = args.album_url
+    check_if_album_is_name_your_price = args.skip_nyp_check
+    page_load_wait_time = args.wait_time
+    preparing_wait_time = args.preparing_wait_time
+    email_address = args.email
+    country_abbrev = args.country_abbrev
+    postal_code = args.postal_code
 
 
-def get_album_download_url(
-    driver,
-    album_url,
-    onsite_encoding=None,
-    check_if_album_is_name_your_price=True,
-    page_load_wait_time=10,
-    preparing_wait_time=60,
-    email_address=None,
-    country_abbrev=None,
-    postal_code=None,
-):
     eprint("Opening", album_url, "...")
     driver.get(album_url)
 
@@ -302,7 +274,20 @@ def get_album_download_url(
             (By.XPATH, "//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/span/a")
         )
     )
-    return direct_download_link.get_attribute("href")
+    download_url = direct_download_link.get_attribute("href")
+
+
+    if args.print_url:
+        print(download_url)
+    else:
+        if args.download_dir is None:
+            download_dir = os.path.curdir
+        else:
+            download_dir = args.download_dir
+        download_dir = os.path.abspath(download_dir)
+        download_file(
+            download_url, download_dir, skip_if_file_exists=args.skip_if_file_exists
+        )
 
 
 def download_file(url, download_dir, skip_if_file_exists=False):
@@ -325,4 +310,4 @@ def eprint(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())
