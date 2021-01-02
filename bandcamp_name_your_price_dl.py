@@ -37,13 +37,13 @@ def main():
     )
     parser.add_argument(
         "album_url",
-        metavar="album_url",
+        metavar="ALBUM_URL",
         type=str,
         help="url of desired bandcamp album",
     )
     parser.add_argument(
         "download_dir",
-        metavar="download_dir",
+        metavar="DOWNLOAD_DIR",
         type=str,
         nargs="?",
         help="directory to download album to",
@@ -51,7 +51,6 @@ def main():
     parser.add_argument(
         "--download-dir",
         "-d",
-        metavar="download_dir",
         type=str,
         help="directory to download album to",
     )
@@ -69,14 +68,14 @@ def main():
     )
     parser.add_argument(
         "--wait-time",
-        metavar="seconds",
+        metavar="SECONDS",
         type=int,
         default=10,
         help="period to wait for pages loading",
     )
     parser.add_argument(
         "--preparing-wait-time",
-        metavar="seconds",
+        metavar="SECONDS",
         type=int,
         default=60,
         help="period to wait for bandcamp preparing download",
