@@ -341,17 +341,17 @@ def main():
     if args.print_url:
         print(download_url)
     else:
-        if args.download_dir is None:
+        if not args.download_dir:
             download_dir = os.path.curdir
         else:
             download_dir = args.download_dir
         download_dir = os.path.abspath(download_dir)
 
-        download_directory_file_name = os.path.join(
-            download_dir, os.path.split(local_file_name)[-1]
-        )
         if local_file_name is not None:
             file_exists_in_initial_file_path = os.path.exists(local_file_name)
+            download_directory_file_name = os.path.join(
+                download_dir, os.path.split(local_file_name)[-1]
+            )
             file_exists_in_download_dir = os.path.exists(download_directory_file_name)
         else:
             file_exists_in_initial_file_path = False
