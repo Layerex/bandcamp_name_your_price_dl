@@ -348,10 +348,10 @@ def main():
             download_dir = args.download_dir
         download_dir = os.path.abspath(download_dir)
 
+        download_directory_file_name = os.path.join(
+            download_dir, os.path.split(local_file_name)[-1]
+        )
         if local_file_name is not None:
-            download_directory_file_name = os.path.exists(
-                os.path.join(download_dir, os.path.split(local_file_name)[-1])
-            )
             file_exists_in_initial_file_path = os.path.exists(local_file_name)
             file_exists_in_download_dir = os.path.exists(download_directory_file_name)
         else:
