@@ -287,7 +287,7 @@ def main():
                 "//*[@id='fan_email_postalcode']"
             )
             postal_code_input.send_keys(postal_code)
-        except ElementNotInteractableException as e:
+        except ElementNotInteractableException:
             asked_for_email = False
 
         checkout_button = driver.find_element_by_xpath(
