@@ -99,7 +99,6 @@ def main():
         action="store_true",
         help="print url to stdout instead of downloading",
     )
-    # TODO: interpret those
     parser.add_argument(
         "--dont-skip-if-file-exists",
         action="store_true",
@@ -225,90 +224,98 @@ def main():
         eprint("Opening", album_url, "...")
         driver.get(album_url)
 
-        # Check if album is actually name your price
+        # Check if album is free download
         try:
-            if (
-                check_if_album_is_name_your_price
-                and driver.find_element_by_xpath(
-                    "//span[@class='buyItemExtra buyItemNyp secondaryText']"
-                ).text
-                != "name your price"
-            ):
-                eprint("Album is not name your price. Aborting.")
-                return 1
+            direct_free_download_button = driver.find_element_by_xpath(
+                "//button[@class='download-link buy-link'][text()='Free Download']"
+            )
+            direct_free_download_button.click()
+        # except NoSuchElementException:
         except NoSuchElementException:
-            eprint(
-                "Element indicating if is album name your price not found. Aborting."
-            )
-            return 1
-
-        try:
-            buy_link = driver.find_element_by_xpath(
-                "//button[@class='download-link buy-link']"
-            )
-            buy_link.click()
-        except NoSuchElementException:
-            eprint('"Buy Digital Album" link not found. Aborting')
-            return 1
-
-        price_input_filled = driver.find_element_by_xpath(
-            "//input[@class='display-price numeric']"
-        )
-        price_input_filled.clear()
-        price_input_filled.send_keys("0")
-
-        free_download_link = WebDriverWait(driver, page_load_wait_time).until(
-            EC.visibility_of_element_located(
-                (By.XPATH, "//a[@class='download-panel-free-download-link']")
-            )
-        )
-        free_download_link.click()
-
-        # Handle bandcamp asking for email
-        try:
-            # Check if element is interactable first to exit try block immediately if it is not
-            # present
-            email_input = driver.find_element_by_xpath("//*[@id='fan_email_address']")
-            email_input.send_keys(str(email_address))
-
-            asked_for_email = True
-            if email_address is None or postal_code is None:
+            # Check if album is name your price
+            try:
+                if (
+                    check_if_album_is_name_your_price
+                    and driver.find_element_by_xpath(
+                        "//span[@class='buyItemExtra buyItemNyp secondaryText']"
+                    ).text
+                    != "name your price"
+                ):
+                    eprint("Album is not name your price. Aborting.")
+                    return 1
+            except NoSuchElementException:
                 eprint(
-                    "Bandcamp asked for email, but no email address or postal code specified."
-                    " Aborting."
+                    "Element indicating if is album name your price not found. Aborting."
                 )
-                return 2
-            if country_abbrev is not None:
-                country_dropdown_list = Select(
-                    driver.find_element_by_xpath("//*[@id='fan_email_country']")
+                return 1
+
+            try:
+                buy_link = driver.find_element_by_xpath(
+                    "//button[@class='download-link buy-link']"
                 )
-                country_dropdown_list.select_by_value(country_abbrev.upper())
-            postal_code_input = driver.find_element_by_xpath(
-                "//*[@id='fan_email_postalcode']"
-            )
-            postal_code_input.send_keys(postal_code)
-        except ElementNotInteractableException:
-            asked_for_email = False
+                buy_link.click()
+            except NoSuchElementException:
+                eprint('"Buy Digital Album" link not found. Aborting')
+                return 1
 
-        checkout_button = driver.find_element_by_xpath(
-            "//button[@class='download-panel-checkout-button']"
-        )
-        # Selenium thinks that checkout button is invisible and refuses to click it, so we click
-        # it with JavaScript
-        driver.execute_script("arguments[0].click();", checkout_button)
+            price_input_filled = driver.find_element_by_xpath(
+                "//input[@class='display-price numeric']"
+            )
+            price_input_filled.clear()
+            price_input_filled.send_keys("0")
 
-        if asked_for_email:
-            eprint(
-                "An email with download link has been sent to",
-                email_address + ".",
-                "Paste link here to continue: ",
+            free_download_link = WebDriverWait(driver, page_load_wait_time).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//a[@class='download-panel-free-download-link']")
+                )
             )
-            link_from_email = input()
-            driver.get(link_from_email)
-        else:
-            WebDriverWait(driver, page_load_wait_time).until(
-                lambda driver: driver.current_url != album_url
+            free_download_link.click()
+
+            # Handle bandcamp asking for email
+            try:
+                # Check if element is interactable first to exit try block immediately if it is not
+                # present
+                email_input = driver.find_element_by_xpath("//*[@id='fan_email_address']")
+                email_input.send_keys(str(email_address))
+
+                asked_for_email = True
+                if email_address is None or postal_code is None:
+                    eprint(
+                        "Bandcamp asked for email, but no email address or postal code specified."
+                        " Aborting."
+                    )
+                    return 2
+                if country_abbrev is not None:
+                    country_dropdown_list = Select(
+                        driver.find_element_by_xpath("//*[@id='fan_email_country']")
+                    )
+                    country_dropdown_list.select_by_value(country_abbrev.upper())
+                postal_code_input = driver.find_element_by_xpath(
+                    "//*[@id='fan_email_postalcode']"
+                )
+                postal_code_input.send_keys(postal_code)
+            except ElementNotInteractableException:
+                asked_for_email = False
+
+            checkout_button = driver.find_element_by_xpath(
+                "//button[@class='download-panel-checkout-button']"
             )
+            # Selenium thinks that checkout button is invisible and refuses to click it, so we click
+            # it with JavaScript
+            driver.execute_script("arguments[0].click();", checkout_button)
+
+            if asked_for_email:
+                eprint(
+                    "An email with download link has been sent to",
+                    email_address + ".",
+                    "Paste link here to continue: ",
+                )
+                link_from_email = input()
+                driver.get(link_from_email)
+            else:
+                WebDriverWait(driver, page_load_wait_time).until(
+                    lambda driver: driver.current_url != album_url
+                )
 
         # Choose encoding from dropdown list
         if onsite_encoding is not None:
