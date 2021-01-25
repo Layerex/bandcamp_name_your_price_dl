@@ -159,12 +159,25 @@ def main():
         except json.JSONDecodeError as e:
             print(e.msg)
             if not ask_to_overwrite_cache():
-                return 3
+                exit(3)
+    else:
+        loaded_cache = []
+
+    def write_cache():
+        if not args.ignore_cache:
+            cache_entry["album_url"] = album_url
+            loaded_cache.append(cache_entry)
+            with open(cache_file, "w") as f:
+                json.dump(loaded_cache, f)
 
     # Search for entry with desired url in cache, if not found then create new one
+
     for entry in loaded_cache:
         if entry["album_url"] == album_url:
             try:
+                if "downloadable" in entry.keys() and not entry["downloadable"]:
+                    eprint("Album marked as undownloadable in cache. Aborting.")
+                    exit(1)
                 download_url = entry["download_url"]
                 local_file_name = entry["local_file_name"]
                 cache_entry = entry
@@ -246,11 +259,15 @@ def main():
                     != "name your price"
                 ):
                     eprint("Album is not name your price. Aborting.")
+                    cache_entry["downloadable"] = False
+                    write_cache()
                     finish_and_exit(1)
             except NoSuchElementException:
                 eprint(
                     "Element indicating if is album name your price not found. Aborting."
                 )
+                cache_entry["downloadable"] = False
+                write_cache()
                 finish_and_exit(1)
 
             try:
@@ -260,6 +277,8 @@ def main():
                 buy_link.click()
             except NoSuchElementException:
                 eprint('"Buy Digital Album" link not found. Aborting')
+                cache_entry["downloadable"] = False
+                write_cache()
                 finish_and_exit(1)
 
             price_input_filled = driver.find_element_by_xpath(
@@ -392,12 +411,9 @@ def main():
     # Add album url, download url and local file name to json file in cache in order to avoid
     # scrapping the page or downloading the album twice
     if not args.ignore_cache:
-        cache_entry["album_url"] = album_url
         cache_entry["download_url"] = download_url
         cache_entry["local_file_name"] = local_file_name
-        loaded_cache.append(cache_entry)
-        with open(cache_file, "w") as f:
-            json.dump(loaded_cache, f)
+        write_cache()
 
     finish_and_exit(0)
 
@@ -409,7 +425,6 @@ def eprint(*args, **kwargs):
 def ask_yes_no(question_string):
     eprint(question_string, "(Y/n)", end=" ")
     return input()[0] in ("Y", "y")
-
 
 
 if __name__ == "__main__":
