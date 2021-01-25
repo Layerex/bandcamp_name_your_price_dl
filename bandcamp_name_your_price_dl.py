@@ -214,6 +214,10 @@ def main():
         elif args.driver == "webkit":
             driver = webdriver.WebKitGTK()
 
+        def finish_and_exit(code):
+            driver.quit()
+            exit(code)
+
         check_if_album_is_name_your_price = not args.skip_nyp_check
         page_load_wait_time = args.wait_time
         preparing_wait_time = args.preparing_wait_time
@@ -242,12 +246,12 @@ def main():
                     != "name your price"
                 ):
                     eprint("Album is not name your price. Aborting.")
-                    return 1
+                    finish_and_exit(1)
             except NoSuchElementException:
                 eprint(
                     "Element indicating if is album name your price not found. Aborting."
                 )
-                return 1
+                finish_and_exit(1)
 
             try:
                 buy_link = driver.find_element_by_xpath(
@@ -256,7 +260,7 @@ def main():
                 buy_link.click()
             except NoSuchElementException:
                 eprint('"Buy Digital Album" link not found. Aborting')
-                return 1
+                finish_and_exit(1)
 
             price_input_filled = driver.find_element_by_xpath(
                 "//input[@class='display-price numeric']"
@@ -275,7 +279,9 @@ def main():
             try:
                 # Check if element is interactable first to exit try block immediately if it is not
                 # present
-                email_input = driver.find_element_by_xpath("//*[@id='fan_email_address']")
+                email_input = driver.find_element_by_xpath(
+                    "//*[@id='fan_email_address']"
+                )
                 email_input.send_keys(str(email_address))
 
                 asked_for_email = True
@@ -284,7 +290,7 @@ def main():
                         "Bandcamp asked for email, but no email address or postal code specified."
                         " Aborting."
                     )
-                    return 2
+                    finish_and_exit(2)
                 if country_abbrev is not None:
                     country_dropdown_list = Select(
                         driver.find_element_by_xpath("//*[@id='fan_email_country']")
@@ -393,6 +399,8 @@ def main():
         with open(cache_file, "w") as f:
             json.dump(loaded_cache, f)
 
+    finish_and_exit(0)
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -403,5 +411,6 @@ def ask_yes_no(question_string):
     return input()[0] in ("Y", "y")
 
 
+
 if __name__ == "__main__":
-    exit(main())
+    main()
