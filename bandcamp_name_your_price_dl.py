@@ -15,6 +15,7 @@ import requests
 from selenium import webdriver
 from selenium.common.exceptions import *
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
@@ -212,18 +213,20 @@ def main():
         if args.driver is None:
             args.driver = "chromium"
         if args.driver in ("chrome", "chromium"):
+            options = webdriver.ChromeOptions()
             if not args.show_browser_window:
-                options = webdriver.ChromeOptions()
                 options.add_argument("--headless")
-            else:
-                options = None
+                options.add_argument("--disable-gpu")
+            options.add_argument("--blink-settings=imagesEnabled=false")
             driver = webdriver.Chrome(options=options)
         elif args.driver == "edge":
             driver = webdriver.Edge()
         elif args.driver in ("firefox", "gecko"):
+            profile = FirefoxProfile()
+            profile.set_preference("permissions.default.image", 2)
             if not args.show_browser_window:
                 os.environ["MOZ_HEADLESS"] = "1"
-            driver = webdriver.Firefox()
+            driver = webdriver.Firefox(profile)
         elif args.driver == "opera":
             driver = webdriver.Opera()
         elif args.driver == "phantomjs":
