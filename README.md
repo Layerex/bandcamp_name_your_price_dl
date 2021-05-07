@@ -1,6 +1,6 @@
 # bandcamp_name_your_price_dl
 
-Automate process of downloading name your price albums from bandcamp with Selenium.
+Automate process of downloading name your price albums from [bandcamp](bandcamp.com) with Selenium.
 
 ## Installation
 
@@ -8,7 +8,7 @@ Automate process of downloading name your price albums from bandcamp with Seleni
 pip install bandcamp_name_your_price_dl
 ```
 
-Also you need to install browser drivers. Refer to [selenium installation guide](https://selenium-python.readthedocs.io/installation.html#drivers).
+Also you need to install a selenium browser driver. Refer to [selenium installation guide](https://selenium-python.readthedocs.io/installation.html#drivers).
 
 ## Usage
 
@@ -59,15 +59,17 @@ optional arguments:
 
 ## Usage example
 
-To list albums of an artist you may use [bandcamp_list_albums](https://github.com/Layerex/bandcamp_list_albums)
-
 ### Download discography of an artist
 
+To list albums of an artist you may use [bandcamp_list_albums](https://github.com/Layerex/bandcamp_list_albums).
+
+[bandcamp-dl](https://github.com/iheanyi/bandcamp-dl) may be used to download not name your price albums.
+
 ```bash
-for album in $(bandcamp_list_albums $bandcamp_page_url --print-urls)
+for album in $(bandcamp_list_albums "$BANDCAMP_PAGE_URL" --print-urls)
 do
-    bandcamp_name_your_price_dl "$album"
+    bandcamp_name_your_price_dl "$album" || bandcamp-dl "$album"
 done
 ```
 
-You may also want to specify download directory, email, country and postcode
+You may also want to specify email, country and postcode in case bandcamp asks for those and download directory.
