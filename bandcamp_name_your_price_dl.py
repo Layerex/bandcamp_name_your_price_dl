@@ -198,7 +198,7 @@ def main():
         loaded_cache.append({"album_url": album_url})
         cache_entry = loaded_cache[-1]
 
-    if download_url is None:
+    if download_url is None or requests.head(download_url).status_code != 200:
         if args.encoding is not None:
             if args.encoding == "mp3":
                 onsite_encoding = "MP3 320"
@@ -373,7 +373,7 @@ def main():
 
         download_url = direct_download_link.get_attribute("href")
     else:
-        eprint("Download url exists in cache. Skipping scrapping.")
+        eprint("Active download url exists in cache. Skipping scrapping.")
 
     if args.print_url:
         print(download_url)
