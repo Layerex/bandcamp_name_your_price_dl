@@ -200,6 +200,39 @@ def main():
         loaded_cache.append({"album_url": album_url})
         cache_entry = loaded_cache[-1]
 
+    if not args.download_dir:
+        download_dir = os.path.curdir
+    else:
+        download_dir = args.download_dir
+    download_dir = os.path.abspath(download_dir)
+
+    if local_file_name is not None:
+        file_exists_in_initial_file_path = os.path.exists(local_file_name)
+        download_directory_file_name = os.path.join(
+            download_dir, os.path.split(local_file_name)[-1]
+        )
+        file_exists_in_download_dir = os.path.exists(download_directory_file_name)
+    else:
+        file_exists_in_initial_file_path = False
+        file_exists_in_download_dir = False
+
+    actions_needed = (
+        (not file_exists_in_initial_file_path and not file_exists_in_download_dir)
+        or args.dont_skip_if_file_exists
+        or args.print_url
+    )
+
+    if not actions_needed:
+        if file_exists_in_initial_file_path:
+            file_name_to_print = local_file_name
+        else:
+            file_name_to_print = download_directory_file_name
+        eprint(
+            f"File exists in {file_name_to_print}. Skipping scrapping and downloading.",
+            "Rerun program with --dont-skip-if-file-exists to redownload.",
+        )
+        finish_and_exit(0)
+
     if download_url is None or requests.head(download_url).status_code != 200:
         if args.encoding is not None:
             if args.encoding == "mp3":
@@ -380,40 +413,15 @@ def main():
     if args.print_url:
         print(download_url)
     else:
-        if not args.download_dir:
-            download_dir = os.path.curdir
-        else:
-            download_dir = args.download_dir
-        download_dir = os.path.abspath(download_dir)
-
-        if local_file_name is not None:
-            file_exists_in_initial_file_path = os.path.exists(local_file_name)
-            download_directory_file_name = os.path.join(
-                download_dir, os.path.split(local_file_name)[-1]
-            )
-            file_exists_in_download_dir = os.path.exists(download_directory_file_name)
-        else:
-            file_exists_in_initial_file_path = False
-            file_exists_in_download_dir = False
-
-        if (
-            not file_exists_in_initial_file_path and not file_exists_in_download_dir
-        ) or args.dont_skip_if_file_exists:
-            with requests.get(download_url, stream=True) as r:
-                content_disposition_header = r.headers["content-disposition"]
-                on_server_file_name = re.findall(
-                    'filename="(.+)"', content_disposition_header
-                )[0]
-                local_file_name = os.path.join(download_dir, on_server_file_name)
-                eprint("Downloading album to", local_file_name, "...")
-                with open(local_file_name, "wb") as f:
-                    shutil.copyfileobj(r.raw, f)
-        else:
-            if file_exists_in_initial_file_path:
-                file_name_to_print = local_file_name
-            else:
-                file_name_to_print = download_directory_file_name
-            eprint(f"File exists in {file_name_to_print}. Skipping downloading.")
+        with requests.get(download_url, stream=True) as r:
+            content_disposition_header = r.headers["content-disposition"]
+            on_server_file_name = re.findall(
+                'filename="(.+)"', content_disposition_header
+            )[0]
+            local_file_name = os.path.join(download_dir, on_server_file_name)
+            eprint("Downloading album to", local_file_name, "...")
+            with open(local_file_name, "wb") as f:
+                shutil.copyfileobj(r.raw, f)
 
     # Add album url, download url and local file name to json file in cache in order to avoid
     # scrapping the page or downloading the album twice
