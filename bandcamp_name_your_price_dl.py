@@ -191,6 +191,7 @@ def main():
                 download_url = entry["download_url"]
                 local_file_name = entry["local_file_name"]
                 cache_entry = entry
+                loaded_cache.remove(entry)
                 break
             except KeyError as e:
                 print(e.msg)
