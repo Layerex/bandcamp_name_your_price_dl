@@ -59,6 +59,8 @@ def main():
     parser.add_argument(
         "--encoding",
         "-e",
+        "--format",
+        "-f",
         type=str,
         choices=("mp3", "mp3v0", "flac", "aac", "ogg", "alac", "wav", "aiff"),
         help="desired encoding",

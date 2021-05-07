@@ -33,7 +33,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --download-dir DOWNLOAD_DIR, -d DOWNLOAD_DIR
                         directory to download album to
-  --encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}, -e {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}
+  --encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}, -e {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}, --format {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}, -f {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}
                         desired encoding
   --skip-nyp-check, --skip-name-your-price-check
                         don't check if album is name your price before downloading
