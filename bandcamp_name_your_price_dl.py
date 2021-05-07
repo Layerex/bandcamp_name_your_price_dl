@@ -138,6 +138,7 @@ def main():
 
     def finish_and_exit(code):
         if driver:
+            driver.close()
             driver.quit()
         exit(code)
 
