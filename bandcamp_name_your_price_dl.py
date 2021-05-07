@@ -355,8 +355,7 @@ def main():
             encoding_dropdown_button.click()
 
             format_list_element = driver.find_element_by_xpath(
-                f"//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/div[4]/ul"
-                "//*[text()='{onsite_encoding}']"
+                f"//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/div[4]/ul//*[text()='{onsite_encoding}']"
             )
             format_list_element.click()
 
