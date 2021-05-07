@@ -133,6 +133,12 @@ def main():
     album_url = args.album_url
     download_url = None
     local_file_name = None
+    driver = None
+
+    def finish_and_exit(code):
+        if driver:
+            driver.quit()
+        exit(code)
 
     # Load cache
     if not args.ignore_cache:
@@ -226,10 +232,6 @@ def main():
             driver = webdriver.Safari()
         elif args.driver == "webkit":
             driver = webdriver.WebKitGTK()
-
-        def finish_and_exit(code):
-            driver.quit()
-            exit(code)
 
         check_if_album_is_name_your_price = not args.skip_nyp_check
         page_load_wait_time = args.wait_time
