@@ -176,7 +176,8 @@ def main():
     def write_cache():
         if not args.ignore_cache:
             cache_entry["album_url"] = album_url
-            loaded_cache.append(cache_entry)
+            if cache_entry not in loaded_cache:
+                loaded_cache.append(cache_entry)
             with open(cache_file, "w") as f:
                 json.dump(loaded_cache, f)
 
