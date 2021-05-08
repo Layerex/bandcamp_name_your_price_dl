@@ -196,7 +196,7 @@ def main():
             except KeyError as e:
                 print(e.msg)
                 if not ask_to_overwrite_cache():
-                    return 3
+                    exit(3)
     else:
         loaded_cache.append({"album_url": album_url})
         cache_entry = loaded_cache[-1]
