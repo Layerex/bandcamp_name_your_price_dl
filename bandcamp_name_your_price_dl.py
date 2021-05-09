@@ -10,6 +10,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
 import requests
 from selenium import webdriver
@@ -133,7 +134,7 @@ def main():
     )
     args = parser.parse_args(sys.argv[1:])
 
-    album_url = args.album_url
+    album_url = remove_url_query_parameters(args.album_url)
     download_url = None
     local_file_name = None
     driver = None
@@ -184,7 +185,7 @@ def main():
     # Search for entry with desired url in cache, if not found then create new one
 
     for entry in loaded_cache:
-        if entry["album_url"] == album_url:
+        if remove_url_query_parameters(entry["album_url"]) == album_url:
             try:
                 if "downloadable" in entry.keys() and not entry["downloadable"]:
                     eprint("Album marked as undownloadable in cache. Aborting.")
@@ -436,6 +437,10 @@ def main():
         write_cache()
 
     finish_and_exit(0)
+
+
+def remove_url_query_parameters(url):
+    return urljoin(url, urlparse(url).path)
 
 
 def eprint(*args, **kwargs):
