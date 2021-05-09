@@ -69,21 +69,21 @@ def main():
         "--skip-nyp-check",
         "--skip-name-your-price-check",
         action="store_true",
-        help="don't check if album is name your price before downloading",
+        help="don't check if album is name your price before trying to download",
     )
     parser.add_argument(
         "--wait-time",
         metavar="SECONDS",
         type=int,
         default=10,
-        help="period to wait for pages loading",
+        help="period to wait for pages loading (in seconds) (default is 10)",
     )
     parser.add_argument(
         "--preparing-wait-time",
         metavar="SECONDS",
         type=int,
         default=60,
-        help="period to wait for bandcamp preparing download",
+        help="period to wait for bandcamp preparing download (in seconds) (default is 60)",
     )
     parser.add_argument(
         "--driver",
@@ -111,7 +111,7 @@ def main():
     parser.add_argument(
         "--ignore-cache",
         action="store_true",
-        help="don't load cache and pretend it is empty",
+        help="don't load cache and don't write anything to it",
     )
     parser.add_argument(
         "--email",
