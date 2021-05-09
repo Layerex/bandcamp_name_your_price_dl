@@ -235,7 +235,10 @@ def main():
         )
         finish_and_exit(0)
 
-    if download_url is None or requests.head(download_url).status_code != 200:
+    if (
+        download_url is None
+        or requests.get(download_url, stream=True).status_code != 200
+    ):
         if args.encoding is not None:
             if args.encoding == "mp3":
                 onsite_encoding = "MP3 320"
