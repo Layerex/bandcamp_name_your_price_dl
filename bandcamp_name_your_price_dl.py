@@ -268,7 +268,7 @@ def main():
             profile.set_preference("permissions.default.image", 2)
             if not args.show_browser_window:
                 os.environ["MOZ_HEADLESS"] = "1"
-            driver = webdriver.Firefox(profile)
+            driver = webdriver.Firefox(profile, service_log_path=os.devnull)
         elif args.driver == "opera":
             driver = webdriver.Opera()
         elif args.driver == "phantomjs":
