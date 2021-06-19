@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import sys
+from enum import IntEnum
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
@@ -31,6 +32,13 @@ drivers = (
     "safari",
     "webkit",
 )
+
+
+class ExitCodes(IntEnum):
+    SUCCESS = 0
+    UNDOWNLOADABLE = 1
+    EMAIL_UNSPECIFIED = 2
+    CACHE_CORRUPTED = 3
 
 
 def main():
@@ -170,7 +178,7 @@ def main():
         except json.JSONDecodeError as e:
             print(e.msg)
             if not ask_to_overwrite_cache():
-                exit(3)
+                exit(ExitCodes.CACHE_CORRUPTED)
     else:
         loaded_cache = []
 
@@ -189,7 +197,7 @@ def main():
             try:
                 if "downloadable" in entry.keys() and not entry["downloadable"]:
                     eprint("Album marked as undownloadable in cache. Aborting.")
-                    exit(1)
+                    exit(ExitCodes.UNDOWNLOADABLE)
                 download_url = entry["download_url"]
                 local_file_name = entry["local_file_name"]
                 cache_entry = entry
@@ -198,7 +206,7 @@ def main():
             except KeyError as e:
                 print(e.msg)
                 if not ask_to_overwrite_cache():
-                    exit(3)
+                    exit(ExitCodes.CACHE_CORRUPTED)
     else:
         loaded_cache.append({"album_url": album_url})
         cache_entry = loaded_cache[-1]
@@ -234,7 +242,7 @@ def main():
             f"File exists in {file_name_to_print}. Skipping scrapping and downloading.",
             "Rerun program with --dont-skip-if-file-exists to redownload.",
         )
-        finish_and_exit(0)
+        finish_and_exit(ExitCodes.SUCCESS)
 
     if (
         download_url is None
@@ -308,14 +316,14 @@ def main():
                     eprint("Album is not name your price. Aborting.")
                     cache_entry["downloadable"] = False
                     write_cache()
-                    finish_and_exit(1)
+                    finish_and_exit(ExitCodes.UNDOWNLOADABLE)
             except NoSuchElementException:
                 eprint(
                     "Element indicating if is album name your price not found. Aborting."
                 )
                 cache_entry["downloadable"] = False
                 write_cache()
-                finish_and_exit(1)
+                finish_and_exit(ExitCodes.UNDOWNLOADABLE)
 
             try:
                 buy_link = driver.find_element_by_xpath(
@@ -326,7 +334,7 @@ def main():
                 eprint('"Buy Digital Album" link not found. Aborting')
                 cache_entry["downloadable"] = False
                 write_cache()
-                finish_and_exit(1)
+                finish_and_exit(ExitCodes.UNDOWNLOADABLE)
 
             price_input_filled = driver.find_element_by_xpath(
                 "//input[@class='display-price numeric']"
@@ -356,7 +364,7 @@ def main():
                         "Bandcamp asked for email, but no email address or postal code specified."
                         " Aborting."
                     )
-                    finish_and_exit(2)
+                    finish_and_exit(ExitCodes.EMAIL_UNSPECIFIED)
                 if country_abbrev is not None:
                     country_dropdown_list = Select(
                         driver.find_element_by_xpath("//*[@id='fan_email_country']")
@@ -436,7 +444,7 @@ def main():
         cache_entry["local_file_name"] = local_file_name
         write_cache()
 
-    finish_and_exit(0)
+    finish_and_exit(ExitCodes.SUCCESS)
 
 
 def remove_url_query_parameters(url):
