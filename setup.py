@@ -29,5 +29,6 @@ setuptools.setup(
         "console_scripts": [
             "bandcamp_name_your_price_dl = bandcamp_name_your_price_dl:main",
         ],
-    }
+    },
+    install_requires=["selenium", "requests", "pystandardpaths"]
 )
