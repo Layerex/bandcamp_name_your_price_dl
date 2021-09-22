@@ -159,10 +159,13 @@ def main():
 
         loaded_cache = []
 
+        def overwrite_cache():
+            with open(cache_file, "w") as f:
+                json.dump(loaded_cache, f)
+
         def ask_to_overwrite_cache():
             if ask_yes_no("Cache seems corrupted. Overwrite?"):
-                with open(cache_file, "w") as f:
-                    json.dump(loaded_cache, f)
+                overwrite_cache()
                 return True
             else:
                 return False
@@ -174,7 +177,9 @@ def main():
         Path(cache_file).touch()
         try:
             with open(cache_file) as f:
-                loaded_cache = json.load(f)
+                s = f.read()
+                if len(s):
+                    loaded_cache = json.loads(s)
         except json.JSONDecodeError as e:
             print(e.msg)
             if not ask_to_overwrite_cache():
