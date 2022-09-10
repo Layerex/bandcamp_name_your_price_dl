@@ -303,7 +303,8 @@ def main():
 
         # Check if album is free download
         try:
-            direct_free_download_button = driver.find_element_by_xpath(
+            direct_free_download_button = driver.find_element(
+                By.XPATH,
                 "//button[@class='download-link buy-link'][text()='Free Download']"
             )
             direct_free_download_button.click()
@@ -313,7 +314,8 @@ def main():
             try:
                 if (
                     check_if_album_is_name_your_price
-                    and driver.find_element_by_xpath(
+                    and driver.find_element(
+                        By.XPATH,
                         "//span[@class='buyItemExtra buyItemNyp secondaryText']"
                     ).text
                     != "name your price"
@@ -331,7 +333,8 @@ def main():
                 finish_and_exit(ExitCodes.UNDOWNLOADABLE)
 
             try:
-                buy_link = driver.find_element_by_xpath(
+                buy_link = driver.find_element(
+                    By.XPATH,
                     "//button[@class='download-link buy-link']"
                 )
                 buy_link.click()
@@ -341,7 +344,8 @@ def main():
                 write_cache()
                 finish_and_exit(ExitCodes.UNDOWNLOADABLE)
 
-            price_input_filled = driver.find_element_by_xpath(
+            price_input_filled = driver.find_element(
+                By.XPATH,
                 "//input[@class='display-price numeric']"
             )
             price_input_filled.clear()
@@ -358,7 +362,8 @@ def main():
             try:
                 # Check if element is interactable first to exit try block immediately if it is not
                 # present
-                email_input = driver.find_element_by_xpath(
+                email_input = driver.find_element(
+                    By.XPATH,
                     "//*[@id='fan_email_address']"
                 )
                 email_input.send_keys(str(email_address))
@@ -372,17 +377,19 @@ def main():
                     finish_and_exit(ExitCodes.EMAIL_UNSPECIFIED)
                 if country_abbrev is not None:
                     country_dropdown_list = Select(
-                        driver.find_element_by_xpath("//*[@id='fan_email_country']")
+                        driver.find_element(By.XPATH, "//*[@id='fan_email_country']")
                     )
                     country_dropdown_list.select_by_value(country_abbrev.upper())
-                postal_code_input = driver.find_element_by_xpath(
+                postal_code_input = driver.find_element(
+                    By.XPATH,
                     "//*[@id='fan_email_postalcode']"
                 )
                 postal_code_input.send_keys(postal_code)
             except ElementNotInteractableException:
                 asked_for_email = False
 
-            checkout_button = driver.find_element_by_xpath(
+            checkout_button = driver.find_element(
+                By.XPATH,
                 "//button[@class='download-panel-checkout-button']"
             )
             # Selenium thinks that checkout button is invisible and refuses to click it, so we click
@@ -414,7 +421,8 @@ def main():
             )
             encoding_dropdown_button.click()
 
-            format_list_element = driver.find_element_by_xpath(
+            format_list_element = driver.find_element(
+                By.XPATH,
                 f"//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/div[4]/ul//*[text()='{onsite_encoding}']"
             )
             format_list_element.click()
