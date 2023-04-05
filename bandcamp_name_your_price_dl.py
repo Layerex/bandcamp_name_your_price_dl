@@ -181,7 +181,7 @@ def main():
                 if len(s):
                     loaded_cache = json.loads(s)
         except json.JSONDecodeError as e:
-            print(e.msg)
+            eprint(e.msg)
             if not ask_to_overwrite_cache():
                 exit(ExitCodes.CACHE_CORRUPTED)
     else:
@@ -195,7 +195,8 @@ def main():
             with open(cache_file, "w") as f:
                 json.dump(loaded_cache, f)
 
-    # Search for entry with desired url in cache, if not found then create new one
+    # Search for entry with desired url in cache
+    # If not found, create a new entry
 
     for entry in loaded_cache:
         if remove_url_query_parameters(entry["album_url"]) == album_url:
@@ -209,7 +210,7 @@ def main():
                 loaded_cache.remove(entry)
                 break
             except KeyError as e:
-                print(e.msg)
+                eprint(e.msg)
                 if not ask_to_overwrite_cache():
                     exit(ExitCodes.CACHE_CORRUPTED)
     else:
@@ -244,7 +245,7 @@ def main():
         else:
             file_name_to_print = download_directory_file_name
         eprint(
-            f"File exists in {file_name_to_print}. Skipping scrapping and downloading.",
+            f"File exists in '{file_name_to_print}'. Skipping scraping and downloading.",
             "Rerun program with --dont-skip-if-file-exists to redownload.",
         )
         finish_and_exit(ExitCodes.SUCCESS)
@@ -302,7 +303,7 @@ def main():
         country_abbrev = args.country_abbrev
         postal_code = args.postal_code
 
-        eprint("Opening", album_url, "...")
+        eprint(f"Opening '{album_url}'...")
         driver.get(album_url)
 
         # Check if album is free download
@@ -312,7 +313,6 @@ def main():
                 "//button[@class='download-link buy-link'][text()='Free Download']"
             )
             direct_free_download_button.click()
-        # except NoSuchElementException:
         except NoSuchElementException:
             # Check if album is name your price
             try:
@@ -343,7 +343,7 @@ def main():
                 )
                 buy_link.click()
             except NoSuchElementException:
-                eprint('"Buy Digital Album" link not found. Aborting')
+                eprint("'Buy Digital Album' link not found. Aborting.")
                 cache_entry["downloadable"] = False
                 write_cache()
                 finish_and_exit(ExitCodes.UNDOWNLOADABLE)
@@ -396,14 +396,13 @@ def main():
                 By.XPATH,
                 "//button[@class='download-panel-checkout-button']"
             )
-            # Selenium thinks that checkout button is invisible and refuses to click it, so we click
-            # it with JavaScript
+            # Selenium thinks that checkout button is invisible and refuses to click it, so it is
+            # clicked with JavaScript
             driver.execute_script("arguments[0].click();", checkout_button)
 
             if asked_for_email:
                 eprint(
-                    "An email with download link has been sent to",
-                    email_address + ".",
+                    f"An email with download link has been sent to {email_address}.",
                     "Paste link here to continue: ",
                 )
                 link_from_email = input()
@@ -440,7 +439,7 @@ def main():
 
         download_url = direct_download_link.get_attribute("href")
     else:
-        eprint("Active download url exists in cache. Skipping scrapping.")
+        eprint("Active download url exists in cache. Skipping scraping.")
 
     if args.print_url:
         print(download_url)
@@ -451,22 +450,22 @@ def main():
                 "filename\*=UTF-8''(.+)", content_disposition_header
             )[0])
             local_file_name = os.path.join(download_dir, on_server_file_name)
-            eprint("Downloading album to", local_file_name, "...")
+            eprint(f"Downloading album to '{local_file_name}'...")
             local_file_exists = os.path.exists(local_file_name)
             if local_file_exists and not args.dont_skip_if_file_exists:
                 eprint(
                     f"File, which wasn't downloaded by this program, exists in '{local_file_name}'.",
-                    "Skipping scrapping and downloading.",
+                    "Skipping scraping and downloading.",
                     "Rerun program with --dont-skip-if-file-exists to download and overwrite this file.",
                 )
             else:
                 if local_file_exists:
-                    eprint(f"Overwriting '{local_file_name}', because --dont-skip-if-file-exists flag provided")
+                    eprint(f"Overwriting '{local_file_name}', because --dont-skip-if-file-exists flag provided.")
                 with open(local_file_name, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
 
     # Add album url, download url and local file name to json file in cache in order to avoid
-    # scrapping the page or downloading the album twice
+    # scraping the page or downloading the album twice
     if not args.ignore_cache:
         cache_entry["download_url"] = download_url
         cache_entry["local_file_name"] = local_file_name
