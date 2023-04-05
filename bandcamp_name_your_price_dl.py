@@ -452,8 +452,18 @@ def main():
             )[0])
             local_file_name = os.path.join(download_dir, on_server_file_name)
             eprint("Downloading album to", local_file_name, "...")
-            with open(local_file_name, "wb") as f:
-                shutil.copyfileobj(r.raw, f)
+            local_file_exists = os.path.exists(local_file_name)
+            if local_file_exists and not args.dont_skip_if_file_exists:
+                eprint(
+                    f"File, which wasn't downloaded by this program, exists in '{local_file_name}'.",
+                    "Skipping scrapping and downloading.",
+                    "Rerun program with --dont-skip-if-file-exists to download and overwrite this file.",
+                )
+            else:
+                if local_file_exists:
+                    eprint(f"Overwriting '{local_file_name}', because --dont-skip-if-file-exists flag provided")
+                with open(local_file_name, "wb") as f:
+                    shutil.copyfileobj(r.raw, f)
 
     # Add album url, download url and local file name to json file in cache in order to avoid
     # scrapping the page or downloading the album twice
