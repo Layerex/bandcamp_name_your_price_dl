@@ -429,7 +429,7 @@ def main():
 
         direct_download_link = WebDriverWait(driver, preparing_wait_time).until(
             EC.visibility_of_element_located(
-                (By.XPATH, "//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/span/a")
+                (By.XPATH, "//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/a[1]")
             )
         )
 
