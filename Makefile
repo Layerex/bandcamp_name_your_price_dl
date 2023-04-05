@@ -1,4 +1,4 @@
-make: dist install
+make: install
 
 clean:
 	rm -rf build dist __pycache__ *.egg-info
@@ -10,6 +10,6 @@ upload:
 	python3 -m twine upload dist/*
 
 install: dist
-	pip install --force-reinstall $(shell ls -t dist/*.whl | head -n1)
+	pip install --force-reinstall --no-deps dist/*.whl
 
 .PHONY: clean dist upload install
