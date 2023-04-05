@@ -11,7 +11,7 @@ import shutil
 import sys
 from enum import IntEnum
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from selenium import webdriver
@@ -447,9 +447,9 @@ def main():
     else:
         with requests.get(download_url, stream=True) as r:
             content_disposition_header = r.headers["content-disposition"]
-            on_server_file_name = re.findall(
-                'filename="(.+)"', content_disposition_header
-            )[0]
+            on_server_file_name = unquote(re.findall(
+                "filename\*=UTF-8''(.+)", content_disposition_header
+            )[0])
             local_file_name = os.path.join(download_dir, on_server_file_name)
             eprint("Downloading album to", local_file_name, "...")
             with open(local_file_name, "wb") as f:
