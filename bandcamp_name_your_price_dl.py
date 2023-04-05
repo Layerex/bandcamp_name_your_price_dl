@@ -255,13 +255,17 @@ def main():
     ):
         if args.encoding is not None:
             if args.encoding == "mp3":
-                onsite_encoding = "MP3 320"
+                onsite_encoding = "mp3-320"
             elif args.encoding == "mp3v0":
-                onsite_encoding = "MP3 V0"
+                onsite_encoding = "mp3-v0"
             elif args.encoding == "ogg":
-                onsite_encoding = "Ogg Vorbis"
+                onsite_encoding = "vorbis"
+            elif args.encoding == "aac":
+                onsite_encoding = "aac-hi"
+            elif args.encoding == "aiff":
+                onsite_encoding = "aiff-lossless"
             else:
-                onsite_encoding = args.encoding.upper()
+                onsite_encoding = args.encoding
         else:
             onsite_encoding = None
 
@@ -415,7 +419,7 @@ def main():
                 EC.visibility_of_element_located(
                     (
                         By.XPATH,
-                        "//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/div[3]/div",
+                        "//*[@id='format-type']",
                     )
                 )
             )
@@ -423,7 +427,8 @@ def main():
 
             format_list_element = driver.find_element(
                 By.XPATH,
-                f"//*[@id='post-checkout-info']/div[1]/div[2]/div[4]/div[4]/ul//*[text()='{onsite_encoding}']"
+                f"//*[@id='format-type']/option[@value='{onsite_encoding}']"
+
             )
             format_list_element.click()
 
