@@ -112,6 +112,11 @@ def main():
         help="print url to stdout instead of downloading",
     )
     parser.add_argument(
+        "--dont-skip-scraping",
+        action="store_true",
+        help="don't skip scraping, if active download url exists in cache",
+    )
+    parser.add_argument(
         "--dont-skip-if-file-exists",
         action="store_true",
         help="don't skip downloading if desired file already exists in current directory or was"
@@ -252,7 +257,8 @@ def main():
         finish_and_exit(ExitCodes.SUCCESS)
 
     if (
-        download_url is None
+        args.dont_skip_scraping
+        or download_url is None
         or requests.get(download_url, stream=True).status_code != 200
     ):
         if args.encoding is not None:

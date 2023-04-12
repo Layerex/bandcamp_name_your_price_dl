@@ -13,10 +13,8 @@ Also you need to install a selenium browser driver. Refer to [selenium installat
 ## Usage
 
 ```text
-usage: bandcamp_name_your_price_dl [-h] [--download-dir DOWNLOAD_DIR] [--encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}]
-                                   [--skip-nyp-check] [--wait-time SECONDS] [--preparing-wait-time SECONDS]
-                                   [--driver {chromium,chrome,edge,firefox,gecko,opera,phantomjs,safari,webkit}]
-                                   [--show-browser-window] [--print-url] [--dont-skip-if-file-exists] [--ignore-cache] [--email EMAIL]
+usage: bandcamp_name_your_price_dl [-h] [--download-dir DOWNLOAD_DIR] [--encoding {mp3,mp3v0,flac,aac,ogg,alac,wav,aiff}] [--skip-nyp-check] [--wait-time SECONDS] [--preparing-wait-time SECONDS]
+                                   [--driver {chromium,chrome,edge,firefox,gecko,opera,phantomjs,safari,webkit}] [--show-browser-window] [--print-url] [--dont-skip-scraping] [--dont-skip-if-file-exists] [--ignore-cache] [--email EMAIL]
                                    [--country-abbrev COUNTRY_ABBREV] [--postal-code POSTAL_CODE]
                                    ALBUM_URL [DOWNLOAD_DIR]
 
@@ -26,7 +24,7 @@ positional arguments:
   ALBUM_URL             url of desired bandcamp album
   DOWNLOAD_DIR          directory to download album to
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --download-dir DOWNLOAD_DIR, -d DOWNLOAD_DIR
                         directory to download album to
@@ -42,6 +40,7 @@ optional arguments:
   --show-browser-window
                         show browser window (is hidden by default)
   --print-url, -p       print url to stdout instead of downloading
+  --dont-skip-scraping  don't skip scraping, if active download url exists in cache
   --dont-skip-if-file-exists
                         don't skip downloading if desired file already exists in current directory or was already downloaded
   --ignore-cache        don't load cache and don't write anything to it
