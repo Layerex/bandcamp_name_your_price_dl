@@ -143,6 +143,7 @@ def main():
     args = parser.parse_args(sys.argv[1:])
 
     album_url = remove_url_query_parameters(args.album_url)
+    cover_url = None
     download_url = None
     local_file_name = None
     driver = None
@@ -336,6 +337,24 @@ def main():
                 write_cache()
                 finish_and_exit(ExitCodes.UNDOWNLOADABLE)
 
+            is_track = False
+            try:
+                driver.find_element(
+                    By.XPATH,
+                    "//*[@id='track_table']"
+                )
+            except NoSuchElementException:
+                is_track = True
+
+            if is_track:
+                try:
+                    cover_url = driver.find_element(
+                        By.XPATH,
+                        "//*[@id='tralbumArt']/a"
+                    ).get_attribute("href").replace("_10", "_0")
+                except NoSuchElementException:
+                    eprint("Track cover image not found.")
+
             try:
                 buy_link = driver.find_element(
                     By.XPATH,
@@ -450,7 +469,7 @@ def main():
                 "filename\*=UTF-8''(.+)", content_disposition_header
             )[0])
             local_file_name = os.path.join(download_dir, on_server_file_name)
-            eprint(f"Downloading album to '{local_file_name}'...")
+            eprint(f"Downloading {'track' if cover_url else 'album'} to '{local_file_name}'...")
             local_file_exists = os.path.exists(local_file_name)
             if local_file_exists and not args.dont_skip_if_file_exists:
                 eprint(
@@ -458,11 +477,29 @@ def main():
                     "Skipping scraping and downloading.",
                     "Rerun program with --dont-skip-if-file-exists to download and overwrite this file.",
                 )
+                return
             else:
                 if local_file_exists:
                     eprint(f"Overwriting '{local_file_name}', because --dont-skip-if-file-exists flag provided.")
                 with open(local_file_name, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
+
+            if cover_url:
+                with requests.get(cover_url, stream=True) as r:
+                    base_name, _ = os.path.splitext(local_file_name)
+                    cover_file_name = base_name + ".jpg"
+                    eprint(f"Downloading cover to '{cover_file_name}'...")
+                    cover_file_exists = os.path.exists(cover_file_name)
+                    if cover_file_exists and not args.dont_skip_if_file_exists:
+                        eprint(
+                            f"Cover image file (probably not downloaded by this program) already exists in '{cover_file_name}'.",
+                            "Rerun program with --dont-skip-if-file-exists to download and overwrite this file.",
+                        )
+                    else:
+                        if cover_file_exists:
+                            eprint(f"Overwriting '{cover_file_name}', because --dont-skip-if-file-exists flag provided.")
+                        with open(cover_file_name, "wb") as f:
+                            shutil.copyfileobj(r.raw, f)
 
     # Add album url, download url and local file name to json file in cache in order to avoid
     # scraping the page or downloading the album twice
